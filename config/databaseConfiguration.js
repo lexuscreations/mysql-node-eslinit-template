@@ -1,70 +1,33 @@
-const Sequelize = require("sequelize");
-const clc = require("cli-color");
+const { Sequelize, DataTypes } = require("sequelize");
 
 const {
-    server: { NODE_ENVIR },
-    dbConfig
-} = require("./config");
+    server: { NODE_ENVIR }
+} = require("./appConfig");
 
-const { username, password, dbname, host, dialect, port } = dbConfig[NODE_ENVIR];
+const { username, password, DBname, dbObj, onSuccess, onError } = require(`./DB_Config/dbConfig_${NODE_ENVIR}`);
 
 let sequelize;
 
 const dbConnect = () => {
-    let dbObj = {
-        host,
-        port,
-        dialect,
-        logging: (val) => console.log(`Db ${host} - Log: ${val}`),
-        pool: {
-            max: 25,
-            min: 0,
-            acquire: 60000,
-            idle: 5000
-        },
-        define: {
-            timestamps: false
-        },
-        dialectOptions: {
-            ssl: {
-                rejectUnauthorized: true
-            },
-            charset: "utf8mb4"
-        },
-        timezone: "+05:30"
-    };
-    if (NODE_ENVIR === "local") {
-        dbObj = {
-            host,
-            port,
-            dialect,
-            logging: (val) => console.log(`Db ${host} - Log: ${val}`),
-            pool: {
-                max: 25,
-                min: 0,
-                acquire: 60000,
-                idle: 5000
-            },
-            define: {
-                timestamps: false
-            },
-            dialectOptions: {
-                charset: "utf8mb4"
-            },
-            timezone: "+05:30"
-        };
-    }
     try {
-        sequelize = new Sequelize(dbname, username, password, dbObj);
+        sequelize = new Sequelize(DBname, username, password, dbObj);
         global.sequelize = sequelize;
-        console.log(clc.green("[*]"), `Db: ${host} - Connection Success and set as global Successfully!!`);
+        onSuccess("Db-ConnectionDone - set as global - sequelizeAuthenticate Pending!!");
     } catch (error) {
-        console.log(clc.red("[*]"), `Db: ${host} - Connection Error: ${error}`);
+        onError(error);
     }
+
+    sequelize
+        .authenticate()
+        .then(() => onSuccess("sequelizeAuthenticate Complete - sequelizeSync-Models Pending!!"))
+        .catch((error) => onError(error, "sequelizeAuthenticate"));
 };
 
 module.exports = {
     dbConnect,
     sequelize,
-    Sequelize
+    Sequelize,
+    DataTypes,
+    onSuccess,
+    onError
 };

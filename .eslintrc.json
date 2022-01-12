@@ -19,7 +19,8 @@
     "import/extensions": "off",
     "arrow-parens": ["warn", "always"],
     "no-console": "off",
-    "indent": ["warn", 2, { "SwitchCase": 1 }],
+    "space-before-function-paren": "warn",
+    "indent": ["off", 2, { "SwitchCase": 1 }],
     "quotes": ["warn", "double"],
     "no-unused-vars": [
       "warn",
