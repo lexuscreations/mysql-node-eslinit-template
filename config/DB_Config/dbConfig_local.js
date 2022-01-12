@@ -1,5 +1,6 @@
 require("dotenv").config();
 const { styledColorLogger } = require("../../helper/styledLogger");
+const { showDevLogs } = require("../appConfig");
 
 const {
     LOCAL_DBPORT: port,
@@ -18,7 +19,7 @@ module.exports = {
             host,
             port,
             dialect,
-            logging: (val) => console.log(`Db ${host} - Log: ${val}`),
+            logging: (msg) => showDevLogs && styledColorLogger.success(`Db: ${host} - ${msg}`),
             define: {
                 timestamps: false
             },

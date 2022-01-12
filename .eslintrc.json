@@ -18,6 +18,8 @@
     "global-require": "warn",
     "import/extensions": "off",
     "arrow-parens": ["warn", "always"],
+    "operator-linebreak": "warn",
+    "consistent-return": "warn",
     "no-console": "off",
     "space-before-function-paren": "warn",
     "indent": ["off", 2, { "SwitchCase": 1 }],

@@ -18,7 +18,7 @@ module.exports = () => {
         },
         profileImage: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: true
         },
         username: {
             type: DataTypes.STRING,

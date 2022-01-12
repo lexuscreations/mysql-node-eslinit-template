@@ -14,5 +14,6 @@ module.exports = {
     secretKeyJwt,
     bcryptSaltRound: 10,
     staticFilesUrlRoute: "/static",
-    uploadPath: "/public/uploads/"
+    uploadPath: "/public/uploads/",
+    showDevLogs: false
 };

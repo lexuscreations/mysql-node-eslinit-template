@@ -1,5 +1,6 @@
 const router = require("express").Router();
 const { userControllers } = require("../../controllers");
+const { multer } = require("../../middlewares");
 
 const getall = (req, res) => {
     res.send("Get Running");
@@ -20,10 +21,7 @@ const remove = (req, res) => {
 
 router.route("/getall").get(getall);
 router.route("/getbyid/:userid").get(getbyid);
-router.route("/create").post((req, res, next) => {
-    console.log("multer.upload,middleware.implementation.pending");
-    next();
-}, userControllers.addUser);
+router.route("/create").post(multer, userControllers.addUser);
 router.route("/update").put(update);
 router.route("/remove").delete(remove);
 
