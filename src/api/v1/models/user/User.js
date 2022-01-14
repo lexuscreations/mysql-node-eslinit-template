@@ -52,6 +52,11 @@ module.exports = () => {
         department: {
             type: DataTypes.STRING,
             allowNull: false
+        },
+        status: {
+            type: DataTypes.STRING,
+            defaultValue: 1,
+            allowNull: false
         }
         // gender: {
         //     type: DataTypes.STRING,

@@ -5,7 +5,8 @@ const { SECRETKEYJWT: secretKeyJwt } = process.env;
 module.exports = {
     server: {
         PORT: 3000,
-        NODE_ENVIR: "local"
+        NODE_ENVIR: "local", // enum: ["development", "production", "local"]
+        domain: "http://localhost:3000"
     },
     apiKeys: {
         smsKey: "",
@@ -15,5 +16,5 @@ module.exports = {
     bcryptSaltRound: 10,
     staticFilesUrlRoute: "/static",
     uploadPath: "/public/uploads/",
-    showDevLogs: false
+    showDevLogsAndResponse: false
 };

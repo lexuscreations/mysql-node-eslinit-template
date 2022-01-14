@@ -6,11 +6,15 @@ db.sequelize = global.sequelize;
 
 db.users = require("./user/User")(sequelize, DataTypes);
 
-db.sequelize
-    .sync({
-        force: false
-    })
-    .then(() => onSuccess("Db-Work-Complete - sequelizeSync-Models Also Complete Successfully!!"))
-    .catch((error) => onError(error, "sequelizeSync-Models"));
-
+const dbSync = async() => {
+    try {
+        await db.sequelize.sync({
+            force: false
+        });
+        onSuccess("Db-Work-Complete - sequelizeSync-Models Also Complete Successfully!!");
+    } catch (error) {
+        onError(error, "sequelizeSync-Models");
+    }
+};
+dbSync();
 module.exports = db;

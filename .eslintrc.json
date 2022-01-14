@@ -20,6 +20,7 @@
     "arrow-parens": ["warn", "always"],
     "operator-linebreak": "warn",
     "consistent-return": "warn",
+    "no-nested-ternary": "warn",
     "no-console": "off",
     "space-before-function-paren": "warn",
     "indent": ["off", 2, { "SwitchCase": 1 }],
