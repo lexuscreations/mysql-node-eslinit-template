@@ -1,3 +1,5 @@
 module.exports = {
-    userControllers: require("./user/userControllers")
+    userControllers: require("./Panel_users.controllers"),
+    rolesControllers: require("./Panel_roles.controllers"),
+    tasksControllers: require("./Panel_tasks.controllers")
 };

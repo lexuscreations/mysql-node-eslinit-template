@@ -1,12 +1,14 @@
+/* eslint-disable camelcase */
 const {
     server: { domain },
     staticFilesUrlRoute,
     showDevLogsAndResponse
 } = require(`${global.rootDirPath}config\\appConfig`);
-const db = require("../../models");
-const { standardResponse } = require("../../helpers");
+const { Op } = require("sequelize");
+const db = require("../models");
+const { standardResponse } = require("../helpers");
 
-const User = db.users;
+const Panel_tasks = db.panel_tasks;
 
 const errCatchResObjRetFn = (res, error) => {
     const { message } = error && error.errors && error.errors[0] ? error.errors[0] : "";
@@ -28,7 +30,7 @@ const errCatchResObjRetFn = (res, error) => {
     return resObj;
 };
 
-const addUser = async(req, res) => {
+const addTask = async(req, res) => {
     const files = [];
     req.files.forEach((file) => {
         if (showDevLogsAndResponse) console.log(__filename, " - addUser() - ", file);
@@ -36,7 +38,7 @@ const addUser = async(req, res) => {
     });
 
     try {
-        const user = await User.create({
+        const user = await Panel_tasks.create({
             ...req.body,
             profileImage: files[0]
         });
@@ -58,13 +60,20 @@ const addUser = async(req, res) => {
     }
 };
 
-const getAllUsers = async(req, res) => {
+const getListRoles = async(req, res) => {
     try {
-        const result = await User.findAll({
+        let option = {
             where: {
-                status: 1
+                status: "1"
             }
-        });
+        };
+        if (req.query && req.query.limit) {
+            option = {
+                ...option,
+                limit: parseInt(req.query.limit, 10)
+            };
+        }
+        const result = await Panel_tasks.findAll(option);
         if (result && result.length) {
             standardResponse({
                 res,
@@ -86,7 +95,7 @@ const getAllUsers = async(req, res) => {
     } catch (error) {
         standardResponse({
             ...errCatchResObjRetFn(res, error),
-            message: "Fetching User List Failed!",
+            message: "Fetching Panel_users List Failed!",
             responseStatusCode: 502
         });
     }
@@ -94,10 +103,15 @@ const getAllUsers = async(req, res) => {
 
 const getById = async(req, res) => {
     try {
-        const result = await User.findOne({
+        const result = await Panel_tasks.findOne({
             where: {
-                _id: req.params.userId,
-                status: 1
+                [Op.and]: [{
+                        id: parseInt(req.params.userId, 10)
+                    },
+                    {
+                        status: "1"
+                    }
+                ]
             }
         });
         if (result) {
@@ -120,18 +134,18 @@ const getById = async(req, res) => {
     } catch (error) {
         standardResponse({
             ...errCatchResObjRetFn(res, error),
-            message: "Fetching User Failed!",
+            message: "Fetching Panel_users Failed!",
             responseStatusCode: 502
         });
     }
 };
 
-const userSearch = async(req, res) => {
+const taskSearch = async(req, res) => {
     try {
-        const result = await User.findOne({
+        const result = await Panel_tasks.findOne({
             where: {
                 ...req.body,
-                status: 1
+                status: "1"
             }
         });
         if (result) {
@@ -154,18 +168,18 @@ const userSearch = async(req, res) => {
     } catch (error) {
         standardResponse({
             ...errCatchResObjRetFn(res, error),
-            message: "Searching User Failed!",
+            message: "Searching Panel_users Failed!",
             responseStatusCode: 502
         });
     }
 };
 
-const updateUser = async(req, res) => {
-    const { _id } = req.body;
+const updateTask = async(req, res) => {
+    const { id } = req.body;
     try {
-        const result = await User.update(req.body, {
+        const result = await Panel_tasks.update(req.body, {
             where: {
-                _id
+                id
             }
         });
         if (result) {
@@ -194,14 +208,14 @@ const updateUser = async(req, res) => {
     }
 };
 
-const removeUser = async(req, res) => {
-    const { _id } = req.body;
+const removeTask = async(req, res) => {
+    const { id } = req.body;
     try {
-        const result = await User.update({
+        const result = await Panel_tasks.update({
             status: 0
         }, {
             where: {
-                _id
+                id
             }
         });
         if (result) {
@@ -231,10 +245,10 @@ const removeUser = async(req, res) => {
 };
 
 module.exports = {
-    addUser,
-    getAllUsers,
+    getListRoles,
     getById,
-    userSearch,
-    updateUser,
-    removeUser
+    taskSearch,
+    addTask,
+    updateTask,
+    removeTask
 };

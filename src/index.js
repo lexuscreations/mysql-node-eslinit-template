@@ -10,7 +10,6 @@ const cookieParser = require("cookie-parser");
 const cors = require("../config/cors");
 const config = require("../config/appConfig");
 require("dotenv").config();
-require("../config/databaseConfiguration").dbConnect();
 
 app.use(logger("dev"));
 

@@ -5,7 +5,7 @@ const { SECRETKEYJWT: secretKeyJwt } = process.env;
 module.exports = {
     server: {
         PORT: 3000,
-        NODE_ENVIR: "local", // enum: ["development", "production", "local"]
+        NODE_ENVIR: "development", // enum: ["development", "production", "local"]
         domain: "http://localhost:3000"
     },
     apiKeys: {

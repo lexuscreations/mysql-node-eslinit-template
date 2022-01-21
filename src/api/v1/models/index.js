@@ -2,9 +2,13 @@ const { sequelize, DataTypes, onSuccess, onError } = require(`${global.rootDirPa
 
 const db = {};
 
-db.sequelize = global.sequelize;
+db.sequelize = sequelize;
 
-db.users = require("./user/User")(sequelize, DataTypes);
+db.panel_users = require("./panel_users")(sequelize, DataTypes);
+db.panel_roles = require("./panel_roles")(sequelize, DataTypes);
+db.panel_tasks = require("./panel_tasks")(sequelize, DataTypes);
+db.panel_user_role_map = require("./panel_user_role_map")(sequelize, DataTypes);
+db.panel_user_task_map = require("./panel_user_task_map")(sequelize, DataTypes);
 
 const dbSync = async() => {
     try {

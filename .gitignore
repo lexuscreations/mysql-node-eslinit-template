@@ -105,3 +105,7 @@ package-lock.json
 /test.js
 /temp.js
 /todo.js
+/task.js
+/extras.js
+extras/
+response/

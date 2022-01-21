@@ -104,3 +104,16 @@
 //     console.log("UNHANDLED REJECTION! 💥 Shutting down...");
 //     process.exit(1);
 // });
+
+// ---------------------------------------------------------------------------------------
+
+// db.users = require("./user/User")(sequelize, DataTypes);
+
+// ---------------------------------------------------------------------------------------
+
+// if (req.query && req.query.limit) {
+//     option = {
+//         ...option,
+//         limit: parseInt(req.query.limit, 10)
+//     };
+// }
