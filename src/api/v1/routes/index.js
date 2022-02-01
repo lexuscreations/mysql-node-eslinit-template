@@ -1,7 +1,7 @@
 const router = require("express").Router();
 
-router.use("/user", require("./Panel_users.routes"));
-router.use("/role", require("./Panel_roles.routes"));
-router.use("/task", require("./Panel_tasks.routes"));
+router.use("/uac/user", require("./Panel_users.routes"));
+router.use("/uac/role", require("./Panel_roles.routes"));
+router.use("/uac/task", require("./Panel_tasks.routes"));
 
 module.exports = router;

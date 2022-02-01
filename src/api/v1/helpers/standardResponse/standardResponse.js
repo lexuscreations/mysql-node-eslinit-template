@@ -1,9 +1,10 @@
 module.exports = ({
     res,
-    status,
+    status = null,
     isError = null,
     message = "",
-    data = {},
+    count = null,
+    data = [],
     err = null,
     msg = null,
     success = null,
@@ -11,17 +12,15 @@ module.exports = ({
     successCode = null,
     responseStatusCode = null
 }) => {
-    let isErrorInstance = isError;
-    const isErrorValidated = isError === null;
-    if (isErrorValidated) isErrorInstance = true;
     const resObj = {
-        status: status === null ? (isErrorInstance ? 0 : 1) : status,
-        isError: isErrorInstance,
-        message: isErrorValidated ? "Please Provide standardResponse!" : message,
+        status: status === null ? null : status,
+        isError,
+        message: isError === null ? "err -> 500 -> Please Provide standardResponse!" : message,
         msg,
-        success: success === null ? !isErrorInstance : success,
+        success: success === null ? !isError : success,
         errorCode,
         successCode,
+        count: count === null ? data.length : count,
         data,
         err
     };

@@ -1,17 +1,22 @@
+/* eslint-disable eqeqeq */
 /* eslint-disable camelcase */
 const {
-    server: { domain },
-    staticFilesUrlRoute,
     showDevLogsAndResponse
 } = require(`${global.rootDirPath}config\\appConfig`);
-const { Op } = require("sequelize");
+const {
+ Op
+} = require("sequelize");
 const db = require("../models");
-const { standardResponse } = require("../helpers");
+const {
+ standardResponse
+} = require("../helpers");
 
 const Panel_tasks = db.panel_tasks;
 
 const errCatchResObjRetFn = (res, error) => {
-    const { message } = error && error.errors && error.errors[0] ? error.errors[0] : "";
+    const {
+ message
+} = error && error.errors && error.errors[0] ? error.errors[0] : "";
     let resObj = {
         res,
         isError: true,
@@ -19,97 +24,100 @@ const errCatchResObjRetFn = (res, error) => {
         responseStatusCode: null,
         msg: message
     };
-    resObj = showDevLogsAndResponse ?
-        {
+    resObj = showDevLogsAndResponse
+        ? {
             ...resObj,
             err: error
-        } :
-        {
+        }
+        : {
             ...resObj
         };
     return resObj;
 };
 
-const addTask = async(req, res) => {
-    const files = [];
-    req.files.forEach((file) => {
-        if (showDevLogsAndResponse) console.log(__filename, " - addUser() - ", file);
-        files.push(`${domain}${staticFilesUrlRoute}/${file.filename}`);
-    });
-
+const addTask = async (req, res) => {
     try {
-        const user = await Panel_tasks.create({
-            ...req.body,
-            profileImage: files[0]
+        const task = await Panel_tasks.create({
+            ...req.body
         });
         standardResponse({
             res,
             isError: false,
-            message: "User Created Successfully!",
+            message: "Task Created Successfully!",
             responseStatusCode: 201,
             successCode: 200,
-            data: user
+            data: task
         });
     } catch (error) {
         standardResponse({
             ...errCatchResObjRetFn(res, error),
-            message: "User Creation Failed!",
+            message: "Task Creation Failed!",
             responseStatusCode: 422,
             errorCode: 409
         });
     }
 };
 
-const getListRoles = async(req, res) => {
+const getListTasks = async (req, res) => {
     try {
-        let option = {
+        let page = req.query && req.query.page
+                ? req.query.page <= 0
+                ? 1
+                : req.query.page
+                : 1;
+        const status = req.query && req.query.status ? req.query.status == 0 ? "0" : "1" : "1";
+        const order = req.query && req.query.order ? ["ASC", "DESC"].includes(req.query.order.toUpperCase()) ? req.query.order.toUpperCase() : "ASC" : "ASC";
+        page = parseInt(page, 10) - 1;
+        const options = {
             where: {
-                status: "1"
-            }
+                status
+            },
+            limit: 20,
+            offset: page * 20,
+            order: [
+                ["id", order]
+            ]
         };
-        if (req.query && req.query.limit) {
-            option = {
-                ...option,
-                limit: parseInt(req.query.limit, 10)
-            };
-        }
-        const result = await Panel_tasks.findAll(option);
+        const result = await Panel_tasks.findAll(options);
         if (result && result.length) {
             standardResponse({
                 res,
                 isError: false,
-                message: "User List Fetch Successfully!",
+                message: "Task List Fetch Successfully!",
                 responseStatusCode: 200,
+                status,
                 data: result
             });
         } else {
             standardResponse({
                 res,
                 isError: false,
-                message: "User Data Not Found!",
+                message: "Task Data Not Found!",
                 responseStatusCode: 404,
                 successCode: 204,
-                data: {}
+                data: {
+}
             });
         }
     } catch (error) {
         standardResponse({
             ...errCatchResObjRetFn(res, error),
-            message: "Fetching Panel_users List Failed!",
+            message: "Fetching Panel_tasks List Failed!",
             responseStatusCode: 502
         });
     }
 };
 
-const getById = async(req, res) => {
+const getById = async (req, res) => {
     try {
+        const status = "1";
         const result = await Panel_tasks.findOne({
             where: {
                 [Op.and]: [{
-                        id: parseInt(req.params.userId, 10)
+                        id: parseInt(req.params.taskId, 10)
                     },
                     {
-                        status: "1"
+                        status
                     }
                 ]
             }
@@ -118,15 +126,16 @@ const getById = async(req, res) => {
             standardResponse({
                 res,
                 isError: false,
-                message: "User Fetch Successfully!",
+                message: "Task Fetch Successfully!",
                 responseStatusCode: 200,
+                status,
                 data: result
             });
         } else {
             standardResponse({
                 res,
                 isError: false,
-                message: "User Data Not Found!",
+                message: "Task Data Not Found!",
                 responseStatusCode: 404,
                 successCode: 204
             });
@@ -134,33 +143,35 @@ const getById = async(req, res) => {
     } catch (error) {
         standardResponse({
             ...errCatchResObjRetFn(res, error),
-            message: "Fetching Panel_users Failed!",
+            message: "Fetching Panel_tasks Failed!",
             responseStatusCode: 502
         });
     }
 };
 
-const taskSearch = async(req, res) => {
+const taskSearch = async (req, res) => {
     try {
-        const result = await Panel_tasks.findOne({
+        const options = {
             where: {
-                ...req.body,
-                status: "1"
+                status: "1",
+                ...req.body
             }
-        });
+        };
+        const result = await Panel_tasks.findAll(options);
         if (result) {
             standardResponse({
                 res,
                 isError: false,
-                message: "User Found Successfully!",
+                message: "Task Found Successfully!",
                 responseStatusCode: 200,
+                status: options.where.status,
                 data: result
             });
         } else {
             standardResponse({
                 res,
                 isError: false,
-                message: "User Data Not Found!",
+                message: "Task Data Not Found!",
                 responseStatusCode: 404,
                 successCode: 204
             });
@@ -168,25 +179,20 @@ const taskSearch = async(req, res) => {
     } catch (error) {
         standardResponse({
             ...errCatchResObjRetFn(res, error),
-            message: "Searching Panel_users Failed!",
+            message: "Searching Panel_tasks Failed!",
             responseStatusCode: 502
         });
     }
 };
 
-const updateTask = async(req, res) => {
-    const { id } = req.body;
+const updateTask = async (req, res) => {
     try {
-        const result = await Panel_tasks.update(req.body, {
-            where: {
-                id
-            }
-        });
+        const result = await Panel_tasks.update(req.body.update, req.body.condition);
         if (result) {
             standardResponse({
                 res,
                 isError: false,
-                message: "User Successfully Updated!",
+                message: "Task Successfully Updated!",
                 responseStatusCode: 201,
                 data: result
             });
@@ -194,7 +200,7 @@ const updateTask = async(req, res) => {
             standardResponse({
                 res,
                 isError: false,
-                message: "User Not Found For Update!",
+                message: "Task Not Found For Update!",
                 responseStatusCode: 404,
                 successCode: 204
             });
@@ -202,27 +208,22 @@ const updateTask = async(req, res) => {
     } catch (error) {
         standardResponse({
             ...errCatchResObjRetFn(res, error),
-            message: "User Updation Failed!",
+            message: "Task Updation Failed!",
             responseStatusCode: 502
         });
     }
 };
 
-const removeTask = async(req, res) => {
-    const { id } = req.body;
+const removeTask = async (req, res) => {
     try {
         const result = await Panel_tasks.update({
             status: 0
-        }, {
-            where: {
-                id
-            }
-        });
+        }, req.body.condition);
         if (result) {
             standardResponse({
                 res,
                 isError: false,
-                message: "User Successfully Deleted!",
+                message: "Task Successfully Deactivated!",
                 responseStatusCode: 201,
                 data: result
             });
@@ -230,7 +231,7 @@ const removeTask = async(req, res) => {
             standardResponse({
                 res,
                 isError: false,
-                message: "User Not Found For Delete!",
+                message: "Task Not Found For Deactivation!",
                 responseStatusCode: 404,
                 successCode: 204
             });
@@ -238,14 +239,14 @@ const removeTask = async(req, res) => {
     } catch (error) {
         standardResponse({
             ...errCatchResObjRetFn(res, error),
-            message: "User Deletion Failed!",
+            message: "Task Deactivation Failed!",
             responseStatusCode: 502
         });
     }
 };
 
 module.exports = {
-    getListRoles,
+    getListTasks,
     getById,
     taskSearch,
     addTask,

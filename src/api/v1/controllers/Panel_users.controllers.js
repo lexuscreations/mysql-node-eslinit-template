@@ -1,17 +1,26 @@
+/* eslint-disable eqeqeq */
 /* eslint-disable camelcase */
 const {
-    server: { domain },
+    server: {
+ domain
+},
     staticFilesUrlRoute,
     showDevLogsAndResponse
 } = require(`${global.rootDirPath}config\\appConfig`);
-const { Op } = require("sequelize");
+const {
+ Op
+} = require("sequelize");
 const db = require("../models");
-const { standardResponse } = require("../helpers");
+const {
+ standardResponse
+} = require("../helpers");
 
 const Panel_users = db.panel_users;
 
 const errCatchResObjRetFn = (res, error) => {
-    const { message } = error && error.errors && error.errors[0] ? error.errors[0] : "";
+    const {
+ message
+} = error && error.errors && error.errors[0] ? error.errors[0] : "";
     let resObj = {
         res,
         isError: true,
@@ -19,18 +28,18 @@ const errCatchResObjRetFn = (res, error) => {
         responseStatusCode: null,
         msg: message
     };
-    resObj = showDevLogsAndResponse ?
-        {
+    resObj = showDevLogsAndResponse
+        ? {
             ...resObj,
             err: error
-        } :
-        {
+        }
+        : {
             ...resObj
         };
     return resObj;
 };
 
-const addUser = async(req, res) => {
+const addUser = async (req, res) => {
     const files = [];
     req.files.forEach((file) => {
         if (showDevLogsAndResponse) console.log(__filename, " - addUser() - ", file);
@@ -60,28 +69,34 @@ const addUser = async(req, res) => {
     }
 };
 
-const getListRoles = async(req, res) => {
+const getListUsers = async (req, res) => {
     try {
-        let page = req.query && req.query.page ? (req.query.page <= 0 ? 1 : req.query.page) : 1;
-        const status = req.query && req.query.page ? (req.query.page <= 0 ? 1 : req.query.page) : 1;
+        let page = req.query && req.query.page
+                ? req.query.page <= 0
+                ? 1
+                : req.query.page
+                : 1;
+        const status = req.query && req.query.status ? req.query.status == 0 ? "0" : "1" : "1";
+        const order = req.query && req.query.order ? ["ASC", "DESC"].includes(req.query.order.toUpperCase()) ? req.query.order.toUpperCase() : "ASC" : "ASC";
         page = parseInt(page, 10) - 1;
-        const option = {
+        const options = {
             where: {
                 status
             },
             limit: 20,
             offset: page * 20,
             order: [
-                ["id", "ASC"]
+                ["id", order]
             ]
         };
-        const result = await Panel_users.findAll(option);
+        const result = await Panel_users.findAll(options);
         if (result && result.length) {
             standardResponse({
                 res,
                 isError: false,
                 message: "User List Fetch Successfully!",
                 responseStatusCode: 200,
+                status,
                 data: result
             });
         } else {
@@ -91,7 +106,8 @@ const getListRoles = async(req, res) => {
                 message: "User Data Not Found!",
                 responseStatusCode: 404,
                 successCode: 204,
-                data: {}
+                data: {
+}
             });
         }
     } catch (error) {
@@ -103,15 +119,16 @@ const getListRoles = async(req, res) => {
     }
 };
 
-const getById = async(req, res) => {
+const getById = async (req, res) => {
     try {
+        const status = "1";
         const result = await Panel_users.findOne({
             where: {
                 [Op.and]: [{
                         id: parseInt(req.params.userId, 10)
                     },
                     {
-                        status: "1"
+                        status
                     }
                 ]
             }
@@ -122,6 +139,7 @@ const getById = async(req, res) => {
                 isError: false,
                 message: "User Fetch Successfully!",
                 responseStatusCode: 200,
+                status,
                 data: result
             });
         } else {
@@ -142,20 +160,22 @@ const getById = async(req, res) => {
     }
 };
 
-const userSearch = async(req, res) => {
+const userSearch = async (req, res) => {
     try {
-        const result = await Panel_users.findAll({
+        const options = {
             where: {
                 status: "1",
                 ...req.body
             }
-        });
+        };
+        const result = await Panel_users.findAll(options);
         if (result) {
             standardResponse({
                 res,
                 isError: false,
                 message: "User Found Successfully!",
                 responseStatusCode: 200,
+                status: options.where.status,
                 data: result
             });
         } else {
@@ -176,14 +196,9 @@ const userSearch = async(req, res) => {
     }
 };
 
-const updateUser = async(req, res) => {
-    const { id } = req.body;
+const updateUser = async (req, res) => {
     try {
-        const result = await Panel_users.update(req.body, {
-            where: {
-                id
-            }
-        });
+        const result = await Panel_users.update(req.body.update, req.body.condition);
         if (result) {
             standardResponse({
                 res,
@@ -210,21 +225,16 @@ const updateUser = async(req, res) => {
     }
 };
 
-const removeUser = async(req, res) => {
-    const { id } = req.body;
+const removeUser = async (req, res) => {
     try {
         const result = await Panel_users.update({
             status: 0
-        }, {
-            where: {
-                id
-            }
-        });
+        }, req.body.condition);
         if (result) {
             standardResponse({
                 res,
                 isError: false,
-                message: "User Successfully Deleted!",
+                message: "User Successfully Deactivated!",
                 responseStatusCode: 201,
                 data: result
             });
@@ -232,7 +242,7 @@ const removeUser = async(req, res) => {
             standardResponse({
                 res,
                 isError: false,
-                message: "User Not Found For Delete!",
+                message: "User Not Found For Deactivation!",
                 responseStatusCode: 404,
                 successCode: 204
             });
@@ -240,7 +250,7 @@ const removeUser = async(req, res) => {
     } catch (error) {
         standardResponse({
             ...errCatchResObjRetFn(res, error),
-            message: "User Deletion Failed!",
+            message: "User Deactivation Failed!",
             responseStatusCode: 502
         });
     }
@@ -248,7 +258,7 @@ const removeUser = async(req, res) => {
 
 module.exports = {
     addUser,
-    getListRoles,
+    getListUsers,
     getById,
     userSearch,
     updateUser,

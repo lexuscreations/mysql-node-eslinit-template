@@ -1,12 +1,16 @@
 const router = require("express").Router();
-const { rolesControllers } = require("../controllers");
-const { multer } = require("../middlewares");
+const {
+ rolesControllers
+} = require("../controllers");
+const {
+ multer
+} = require("../middlewares");
 
+router.route("/create").post(rolesControllers.addRole);
 router.route("/getlist").get(rolesControllers.getListRoles);
 router.route("/getbyid/:roleId").get(rolesControllers.getById);
 router.route("/search").post(rolesControllers.roleSearch);
-router.route("/create").post(multer, rolesControllers.addRole);
 router.route("/update").put(rolesControllers.updateRole);
-router.route("/remove").delete(rolesControllers.removeRole);
+router.route("/remove").patch(rolesControllers.removeRole);
 
 module.exports = router;
