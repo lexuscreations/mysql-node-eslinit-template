@@ -1,12 +1,13 @@
 const path = require("path");
 
-global.rootDirPath = path.join(`${__dirname}/../`);
+global.rootDirPath = path.join(`${__dirname}\\..\\`);
 const express = require("express");
 
 const app = express();
 const clc = require("cli-color");
 const logger = require("morgan");
 const cookieParser = require("cookie-parser");
+const fileUpload = require("express-fileupload");
 const cors = require("../config/cors");
 const config = require("../config/appConfig");
 require("dotenv").config();
@@ -32,7 +33,9 @@ app.set("views", path.join(__dirname, "../views"));
 
 cors(app);
 
-app.use(config.staticFilesUrlRoute, express.static(path.join(__dirname, "../", config.uploadPath)));
+app.use(config.staticFilesUrlRoute, express.static(path.join(__dirname, "..\\", config.uploadPath)));
+
+app.use(fileUpload());
 
 app.use("/api", require("./api"));
 
@@ -50,7 +53,8 @@ app.use((err, req, res, next) => {
         isError: true,
         message: "Route Not Found!",
         msg: err.message,
-        data: config.showDevLogsAndResponse ? err.stack : {},
+        data: config.showDevLogsAndResponse ? err.stack : {
+},
         err,
         errorCode: statusCode,
         success: false

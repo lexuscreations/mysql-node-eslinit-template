@@ -1,6 +1,8 @@
 require("dotenv").config();
 
-const { SECRETKEYJWT: secretKeyJwt } = process.env;
+const {
+ SECRETKEYJWT: secretKeyJwt
+} = process.env;
 
 module.exports = {
     server: {
@@ -15,6 +17,6 @@ module.exports = {
     secretKeyJwt,
     bcryptSaltRound: 10,
     staticFilesUrlRoute: "/static",
-    uploadPath: "/public/uploads/",
+    uploadPath: "\\public\\uploads\\",
     showDevLogsAndResponse: false
 };

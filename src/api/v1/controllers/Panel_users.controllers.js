@@ -1,3 +1,4 @@
+/* eslint-disable new-cap */
 /* eslint-disable eqeqeq */
 /* eslint-disable camelcase */
 const {
@@ -10,6 +11,10 @@ const {
 const {
  Op
 } = require("sequelize");
+const os = require("os");
+const {
+ v4: uuid
+} = require("uuid");
 const db = require("../models");
 const {
  standardResponse
@@ -40,17 +45,47 @@ const errCatchResObjRetFn = (res, error) => {
 };
 
 const addUser = async (req, res) => {
-    const files = [];
-    req.files.forEach((file) => {
-        if (showDevLogsAndResponse) console.log(__filename, " - addUser() - ", file);
-        files.push(`${domain}${staticFilesUrlRoute}/${file.filename}`);
-    });
-
     try {
+        if (!req.files) {
+          return standardResponse({
+                ...errCatchResObjRetFn(res, null),
+                message: "Please Fill Valid Data In All The Fields!",
+                responseStatusCode: 422,
+                errorCode: 400
+            });
+        }
+
+        const allowed_ext = ["jpeg", "jpg", "png"];
+        const files = [];
+        Object.keys(req.files).forEach((key) => {
+            const extData = req.files[key].mimetype.split("/")[1];
+            if (allowed_ext.indexOf(extData) !== -1) {
+                    if (showDevLogsAndResponse) console.log(__filename, " - addUser() - ", req.files[key]);
+                    files.push(req.files[key]);
+               }
+        });
+
+        const filedetail = {
+            filename: files[0].name,
+            filepath: `${global.rootDirPath}public\\uploads\\${Date.now()}-${os.cpus()[0].times.user}-${uuid()}-${files[0].name}`
+        };
+
+        files[0].mv(filedetail.filepath, (err) => {
+            if (err) {
+                return standardResponse({
+                    ...errCatchResObjRetFn(res, err),
+                    message: "Failed In File Upload!",
+                    errorCode: 500
+                });
+            }
+            if (showDevLogsAndResponse) console.log(__filename, " - addUser() - ", files[0], " file uploaded!");
+          });
+
         const user = await Panel_users.create({
             ...req.body,
-            profileImage: files[0]
+            profileImage: filedetail.filepath
         });
+
         standardResponse({
             res,
             isError: false,
