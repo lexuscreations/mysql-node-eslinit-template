@@ -2,9 +2,6 @@ const router = require("express").Router();
 const {
  tasksControllers
 } = require("../controllers");
-const {
- multer
-} = require("../middlewares");
 
 router.route("/create").post(tasksControllers.addTask);
 router.route("/getlist").get(tasksControllers.getListTasks);

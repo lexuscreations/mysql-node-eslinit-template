@@ -2,9 +2,6 @@ const router = require("express").Router();
 const {
  rolesControllers
 } = require("../controllers");
-const {
- multer
-} = require("../middlewares");
 
 router.route("/create").post(rolesControllers.addRole);
 router.route("/getlist").get(rolesControllers.getListRoles);
