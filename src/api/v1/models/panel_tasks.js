@@ -1,7 +1,7 @@
 /* jshint indent: 2 */
 
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('panel_tasks', {
+module.exports = function (sequelize, DataTypes) {
+  return sequelize.define("panel_tasks", {
     id: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
@@ -16,21 +16,21 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     },
     status: {
-      type: DataTypes.ENUM('0','1'),
+      type: DataTypes.ENUM("0", "1"),
       allowNull: true,
-      defaultValue: '1'
+      defaultValue: "1"
     },
     created: {
       type: DataTypes.DATE,
       allowNull: true,
-      defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
+      defaultValue: sequelize.literal("CURRENT_TIMESTAMP")
     },
     modified: {
       type: DataTypes.DATE,
       allowNull: true,
-      defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
+      defaultValue: sequelize.literal("CURRENT_TIMESTAMP")
     }
   }, {
-    tableName: 'panel_tasks'
+    tableName: "panel_tasks"
   });
 };

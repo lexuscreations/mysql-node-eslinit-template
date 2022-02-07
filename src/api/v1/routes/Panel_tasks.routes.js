@@ -4,7 +4,7 @@ const {
 } = require("../controllers");
 
 router.route("/create").post(tasksControllers.addTask);
-router.route("/getlist").get(tasksControllers.getListTasks);
+router.route("/getlist").post(tasksControllers.getListTasks);
 router.route("/getbyid/:taskId").get(tasksControllers.getById);
 router.route("/search").post(tasksControllers.taskSearch);
 router.route("/update").put(tasksControllers.updateTask);

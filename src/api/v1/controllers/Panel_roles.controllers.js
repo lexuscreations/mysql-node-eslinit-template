@@ -68,7 +68,7 @@ const getListRoles = async (req, res) => {
         const status = req.query && req.query.status ? req.query.status == 0 ? "0" : "1" : "1";
         const order = req.query && req.query.order ? ["ASC", "DESC"].includes(req.query.order.toUpperCase()) ? req.query.order.toUpperCase() : "ASC" : "ASC";
         page = parseInt(page, 10) - 1;
-        const options = {
+        let options = {
             where: {
                 status
             },
@@ -78,6 +78,11 @@ const getListRoles = async (req, res) => {
                 ["id", order]
             ]
         };
+
+        options = {
+...options, ...req.body.keys
+};
+
         const result = await Panel_roles.findAll(options);
         if (result && result.length) {
             standardResponse({
